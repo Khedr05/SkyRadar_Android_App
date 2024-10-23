@@ -12,9 +12,6 @@ object RetrofitInstance {
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-
-    fun getApiService(): ApiServices {
-        return retrofit.create(ApiServices::class.java)
-    }
+        .create(ApiServices::class.java)
 }
 

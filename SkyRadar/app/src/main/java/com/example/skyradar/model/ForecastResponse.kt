@@ -1,6 +1,6 @@
 package com.example.skyradar.model
 
-data class Root(
+data class ForecastResponse(
     val cod: String,
     val message: Long,
     val cnt: Long,

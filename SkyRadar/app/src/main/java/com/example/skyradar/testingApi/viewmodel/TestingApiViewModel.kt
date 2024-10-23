@@ -1,35 +1,45 @@
 package com.example.skyradar.testingApi.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.skyradar.model.ForecastResponse
 import com.example.skyradar.model.Repository
-import com.example.skyradar.model.Root // Now handling the entire Root object
+import com.example.skyradar.model.WeatherResponse
+import com.example.skyradar.network.ResponseStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class TestingApiViewModel(private val _repo: Repository) : ViewModel() {
 
-    // Update MutableLiveData to hold the entire Root object
-    private val _weatherData = MutableLiveData<Root>()
-    val weatherData: LiveData<Root> get() = _weatherData
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _forecastData = MutableStateFlow<ResponseStatus<ForecastResponse>>(ResponseStatus.Loading)
+    val forecastData: StateFlow<ResponseStatus<ForecastResponse>> get() = _forecastData
+
+    private val _forecastError = MutableStateFlow<String?>(null)
+    val forecastError: StateFlow<String?> get() = _forecastError
+
+    private val _weatherData = MutableStateFlow<ResponseStatus<WeatherResponse>>(ResponseStatus.Loading)
+    val weatherData: StateFlow<ResponseStatus<WeatherResponse>> get() = _weatherData
+
+    private val _weatherError = MutableStateFlow<String?>(null)
+    val weatherError: StateFlow<String?> get() = _weatherError
 
     // Fetch weather data using latitude and longitude, including units and language
     fun fetchWeatherData(latitude: String, longitude: String, units: String, lang: String) {
+        _weatherData.value = ResponseStatus.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val weatherDataRoot = _repo.getForecastData(latitude, longitude, units, lang)
-                Log.i("TestingApiViewModel", "Weather data fetched successfully: ${weatherDataRoot.city.name}")
+                _repo.getWeatherData(latitude, longitude, units, lang).collect { weatherDataRoot ->
+                    Log.i("TestingApiViewModel", "Weather data fetched successfully: ${weatherDataRoot.name}")
 
-                // Post the entire Root object
-                _weatherData.postValue(weatherDataRoot)
+                    // Post the entire Root object wrapped in ResponseStatus.Success
+                    _weatherData.value = ResponseStatus.Success(weatherDataRoot)
+                }
             } catch (e: Exception) {
-                _error.postValue("Error while fetching weather data: ${e.message}")
+                _weatherError.value = "Error while fetching weather data: ${e.message}"
                 Log.i("TestingApiViewModel", "Error while fetching weather data: ${e.message}")
             }
         }
@@ -37,16 +47,36 @@ class TestingApiViewModel(private val _repo: Repository) : ViewModel() {
 
     // Fetch weather data by city name, including units and language
     fun fetchWeatherDataByCityName(cityName: String, units: String, lang: String) {
+        _weatherData.value = ResponseStatus.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val weatherDataRoot = _repo.getForecastDataByCityName(cityName, units, lang)
-                Log.i("TestingApiViewModel", "Weather data fetched successfully for city: ${weatherDataRoot.city.name}")
+                _repo.getWeatherDataByCityName(cityName, units, lang).collect { weatherDataRoot ->
+                    Log.i("TestingApiViewModel", "Weather data fetched successfully for city: ${weatherDataRoot.name}")
 
-                // Post the entire Root object
-                _weatherData.postValue(weatherDataRoot)
+                    // Post the entire Root object wrapped in ResponseStatus.Success
+                    _weatherData.value = ResponseStatus.Success(weatherDataRoot)
+                }
             } catch (e: Exception) {
-                _error.postValue("Error while fetching weather data by city name: ${e.message}")
+                _weatherError.value = "Error while fetching weather data by city name: ${e.message}"
                 Log.i("TestingApiViewModel", "Error while fetching weather data by city name: ${e.message}")
+            }
+        }
+    }
+
+    // Fetch forecast data using latitude and longitude, including units and language
+    fun fetchForecastData(latitude: String, longitude: String, units: String, lang: String) {
+        _forecastData.value = ResponseStatus.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _repo.getForecastData(latitude, longitude, units, lang).collect { weatherDataRoot ->
+                    Log.i("TestingApiViewModel", "Weather data fetched successfully: ${weatherDataRoot.city.name}")
+
+                    // Post the entire Root object wrapped in ResponseStatus.Success
+                    _forecastData.value = ResponseStatus.Success(weatherDataRoot)
+                }
+            } catch (e: Exception) {
+                _forecastError.value = "Error while fetching weather data: ${e.message}"
+                Log.i("TestingApiViewModel", "Error while fetching weather data: ${e.message}")
             }
         }
     }
