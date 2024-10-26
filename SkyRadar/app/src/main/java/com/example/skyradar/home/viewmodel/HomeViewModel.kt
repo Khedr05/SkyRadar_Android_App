@@ -1,4 +1,4 @@
-package com.example.skyradar.testingApi.viewmodel
+package com.example.skyradar.home.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class TestingApiViewModel(private val _repo: Repository) : ViewModel() {
+class HomeViewModel(private val _repo: Repository) : ViewModel() {
 
 
     private val _forecastData = MutableStateFlow<ResponseStatus<ForecastResponse>>(ResponseStatus.Loading)

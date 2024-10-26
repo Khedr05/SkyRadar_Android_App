@@ -6,7 +6,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.skyradar.testingApi.view.WeatherActivity // Import your WeatherActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Start WeatherActivity directly without any button
-        val intent = Intent(this, WeatherActivity::class.java)
+        val intent = Intent(this, RootActivity::class.java)
         startActivity(intent)
 
         // Optional: Finish MainActivity so the user cannot return to it
