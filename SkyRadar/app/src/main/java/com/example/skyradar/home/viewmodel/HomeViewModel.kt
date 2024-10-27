@@ -69,14 +69,14 @@ class HomeViewModel(private val _repo: Repository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _repo.getForecastData(latitude, longitude, units, lang).collect { weatherDataRoot ->
-                    Log.i("TestingApiViewModel", "Weather data fetched successfully: ${weatherDataRoot.city.name}")
+                    Log.i("TestingApiViewModel", "Forecast data fetched successfully: ${weatherDataRoot.city.name}")
 
                     // Post the entire Root object wrapped in ResponseStatus.Success
                     _forecastData.value = ResponseStatus.Success(weatherDataRoot)
                 }
             } catch (e: Exception) {
                 _forecastError.value = "Error while fetching weather data: ${e.message}"
-                Log.i("TestingApiViewModel", "Error while fetching weather data: ${e.message}")
+                Log.i("TestingApiViewModel", "Error while fetching forecast data: ${e.message}")
             }
         }
     }

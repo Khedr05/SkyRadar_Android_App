@@ -63,7 +63,6 @@ class MapFragment : Fragment() {
                 location?.let {
                     addMarkerAtLocation(it)
                     zoomToLocation(it)
-                    showWeatherDialog(it)
                 }
             }
         }
@@ -78,7 +77,6 @@ class MapFragment : Fragment() {
                     mapViewModel.updateSelectedLocation(it)
                     zoomToLocation(it)
                     Toast.makeText(context, "Selected Lat: ${it.latitude}, Lon: ${it.longitude}", Toast.LENGTH_SHORT).show()
-                    showWeatherDialog(it)
                 }
                 return true
             }
@@ -92,35 +90,7 @@ class MapFragment : Fragment() {
         mapView.overlays.add(mapEventsOverlay)
     }
 
-//    private fun setupSearchListener() {
-//        searchBar.setOnEditorActionListener { _, actionId, _ ->
-//            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-//                val locationName = searchBar.text.toString()
-//                searchLocationByName(locationName)
-//                true
-//            } else {
-//                false
-//            }
-//        }
-//    }
 
-    private fun searchLocationByName(locationName: String) {
-        try {
-            val addressList = geocoder.getFromLocationName(locationName, 1)
-            if (addressList != null && addressList.isNotEmpty()) {
-                val address = addressList[0]
-                val geoPoint = GeoPoint(address.latitude, address.longitude)
-                mapViewModel.updateSelectedLocation(geoPoint)
-                zoomToLocation(geoPoint)
-                Toast.makeText(context, "Found: $locationName", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Location not found", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(context, "Error finding location", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun addMarkerAtLocation(location: GeoPoint) {
         selectedMarker?.let {
@@ -139,15 +109,6 @@ class MapFragment : Fragment() {
     private fun zoomToLocation(location: GeoPoint) {
         mapView.controller.setCenter(location)
         mapView.controller.setZoom(19.5)
-    }
-
-    private fun showWeatherDialog(location: GeoPoint) {
-        val weatherDialog = WeatherDetailsFragment()
-        val args = Bundle()
-        args.putDouble("latitude", location.latitude)
-        args.putDouble("longitude", location.longitude)
-        weatherDialog.arguments = args
-        weatherDialog.show(parentFragmentManager, "weatherDialog")
     }
 
     override fun onResume() {

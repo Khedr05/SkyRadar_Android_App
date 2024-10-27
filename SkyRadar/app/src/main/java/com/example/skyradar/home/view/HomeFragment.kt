@@ -1,16 +1,16 @@
 package com.example.skyradar.home.view
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -25,157 +25,205 @@ import com.example.skyradar.network.ResponseStatus
 import com.example.skyradar.network.RetrofitInstance
 import com.example.skyradar.home.viewmodel.HomeFactory
 import com.example.skyradar.home.viewmodel.HomeViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import android.app.AlertDialog
 
 class HomeFragment : Fragment() {
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
     private lateinit var homeAdapter: HomeAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var cityNameView: TextView
-    private lateinit var currentTempValue: TextView
-    private lateinit var weatherValue: TextView
-    private lateinit var humidityValue: TextView
-    private lateinit var pressureValue: TextView
-    private lateinit var tempMaxValue: TextView
-    private lateinit var tempMinValue: TextView
-    private lateinit var windSpeedValue: TextView
-    private lateinit var cloudsValue: TextView
     private lateinit var viewModel: HomeViewModel
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private val uiElements: MutableMap<String, TextView> = mutableMapOf()
+
+    private var isAlertDialogShown = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeUI(view)
+        initializeViewModel()
+        setupRecyclerView()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        // Initialize views
+        observeViewModel()
+        checkLocationEnabled()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkLocationEnabled()
+    }
+
+    private fun initializeUI(view: View) {
         recyclerView = view.findViewById(R.id.recyclerView)
-        cityNameView = view.findViewById(R.id.textView)
-        currentTempValue = view.findViewById(R.id.currentTempValue)
-        weatherValue = view.findViewById(R.id.weatherValue)
-        humidityValue = view.findViewById(R.id.humidityValue)
-        pressureValue = view.findViewById(R.id.pressureValue)
-        tempMaxValue = view.findViewById(R.id.tempMaxValue)
-        tempMinValue = view.findViewById(R.id.tempMinValue)
-        windSpeedValue = view.findViewById(R.id.windSpeedValue)
-        cloudsValue = view.findViewById(R.id.cloudsValue)
+        uiElements["cityName"] = view.findViewById(R.id.textView)
+        uiElements["currentTempValue"] = view.findViewById(R.id.currentTempValue)
+        uiElements["weatherValue"] = view.findViewById(R.id.weatherValue)
+        uiElements["humidityValue"] = view.findViewById(R.id.humidityValue)
+        uiElements["pressureValue"] = view.findViewById(R.id.pressureValue)
+        uiElements["tempMaxValue"] = view.findViewById(R.id.tempMaxValue)
+        uiElements["tempMinValue"] = view.findViewById(R.id.tempMinValue)
+        uiElements["windSpeedValue"] = view.findViewById(R.id.windSpeedValue)
+        uiElements["cloudsValue"] = view.findViewById(R.id.cloudsValue)
+    }
 
-        homeAdapter = HomeAdapter()
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = homeAdapter
-
+    private fun initializeViewModel() {
         val factory = HomeFactory(
             RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit))
         )
-
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestLocationPermission()
-        } else {
-            fetchLocationAndInitializeWeatherData()
-        }
-
-        //observeViewModel()
-
     }
 
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            LOCATION_PERMISSION_REQUEST_CODE)
+    private fun setupRecyclerView() {
+        homeAdapter = HomeAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = homeAdapter
+    }
+
+    private fun checkLocationEnabled() {
+        val locationManager = requireContext().getSystemService(LocationManager::class.java)
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        if (!isGpsEnabled && !isNetworkEnabled) {
+            if (!isAlertDialogShown) {
+                showLocationEnableAlert()
+                isAlertDialogShown = true
+            }
+        } else {
+            isAlertDialogShown = false
+            checkLocationPermissionAndRequestLocation()
+        }
+    }
+
+    private fun showLocationEnableAlert() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Enable Location Services")
+            .setMessage("This app requires location services to provide weather updates. Please enable location services in your settings.")
+            .setPositiveButton("Enable") { _, _ ->
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                isAlertDialogShown = false
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+                isAlertDialogShown = false
+            }
+            .show()
+    }
+
+    private fun checkLocationPermissionAndRequestLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            requestCurrentLocation()
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun requestCurrentLocation() {
+        val locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    fusedLocationClient.removeLocationUpdates(this)
+                    val location = locationResult.lastLocation
+                    if (location != null) {
+                        fetchWeatherData(location)
+                    } else {
+                        showSnackbar("Failed to get location")
+                    }
+                }
+            }, null)
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        }
+    }
+
+    private fun fetchWeatherData(location: android.location.Location) {
+        viewModel.fetchForecastData(location.latitude.toString(), location.longitude.toString(), "metric", "en")
+        viewModel.fetchWeatherData(location.latitude.toString(), location.longitude.toString(), "metric", "en")
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            viewModel.weatherData.collect { state -> handleWeatherResponse(state) }
+        }
+        lifecycleScope.launch {
+            viewModel.forecastData.collect { state -> handleForecastResponse(state) }
+        }
+    }
+
+    private fun handleWeatherResponse(state: ResponseStatus<*>) {
+        when (state) {
+            is ResponseStatus.Loading -> {}
+            is ResponseStatus.Success<*> -> {
+                when (val requestedData = state.requestedData) {
+                    is WeatherResponse -> updateWeatherUI(requestedData)
+                }
+            }
+            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
+        }
+    }
+
+    private fun handleForecastResponse(state: ResponseStatus<*>) {
+        when (state) {
+            is ResponseStatus.Loading -> {}
+            is ResponseStatus.Success<*> -> {
+                when (val requestedData = state.requestedData) {
+                    is ForecastResponse -> homeAdapter.submitList(requestedData.list)
+                }
+            }
+            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
+        }
+    }
+
+    private fun updateWeatherUI(requestedData: WeatherResponse) {
+        uiElements["cityName"]?.text = requestedData.name
+        uiElements["currentTempValue"]?.text = "${requestedData.main.temp} °C"
+        uiElements["weatherValue"]?.text = requestedData.weather[0].description.capitalize()
+        uiElements["humidityValue"]?.text = "${requestedData.main.humidity}%"
+        uiElements["pressureValue"]?.text = "${requestedData.main.pressure} hPa"
+        uiElements["tempMaxValue"]?.text = "${requestedData.main.tempMax} °C"
+        uiElements["tempMinValue"]?.text = "${requestedData.main.tempMin} °C"
+        uiElements["windSpeedValue"]?.text = "${requestedData.wind.speed} m/s"
+        uiElements["cloudsValue"]?.text = "${requestedData.clouds.all} %"
+    }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fetchLocationAndInitializeWeatherData()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Location permission is required",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            requestCurrentLocation()
+        } else {
+            showSnackbar("Location permission is required to get your current weather.")
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun fetchLocationAndInitializeWeatherData() {
-        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                initializeWeatherData(location.latitude, location.longitude)
-            } else {
-                Toast.makeText(requireContext(), "Unable to get location", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun initializeWeatherData(lat: Double, lon: Double) {
-        observeViewModel()
-        viewModel.fetchForecastData(lat.toString(), lon.toString(), "metric", "en")
-    }
-
-
-    private fun observeViewModel() {
-        // Collect weather data state
-        lifecycleScope.launch {
-            viewModel.forecastData.collect { state ->
-                when (state) {
-                    is ResponseStatus.Loading -> {
-                        // Handle loading state (e.g., show a progress bar)
-                    }
-
-                    is ResponseStatus.Success<*> -> {
-                        when (val requestedData = state.requestedData) {
-                            is ForecastResponse -> {
-                                // Handle ForecastResponse data
-                                homeAdapter.submitList(requestedData.list)
-                                cityNameView.text = requestedData.city.name
-                                currentTempValue.text = "${requestedData.list[0].main.temp} °C"
-                                weatherValue.text = requestedData.list[0].weather[0].description.capitalize()
-                                humidityValue.text = "${requestedData.list[0].main.humidity}%"
-                                pressureValue.text = "${requestedData.list[0].main.pressure} hPa"
-                                tempMaxValue.text = "${requestedData.list[0].main.tempMax} °C"
-                                tempMinValue.text = "${requestedData.list[0].main.tempMin} °C"
-                                windSpeedValue.text = "${requestedData.list[0].wind.speed} m/s"
-                                cloudsValue.text = "${requestedData.list[0].clouds.all} %"
-                            }
-                            is WeatherResponse -> {
-                                // Handle WeatherResponse data
-                                cityNameView.text = requestedData.name
-                                currentTempValue.text = "${requestedData.main.temp} °C"
-                                weatherValue.text = requestedData.weather[0].description.capitalize()
-                                humidityValue.text = "${requestedData.main.humidity}%"
-                                pressureValue.text = "${requestedData.main.pressure} hPa"
-                                tempMaxValue.text = "${requestedData.main.tempMax} °C"
-                                tempMinValue.text = "${requestedData.main.tempMin} °C"
-                                windSpeedValue.text = "${requestedData.wind.speed} m/s"
-                                cloudsValue.text = "${requestedData.clouds.all} %"
-                            }
-                        }
-                    }
-
-                    is ResponseStatus.Failure -> {
-                        Toast.makeText(requireContext(), "Error: ${state.errorMessage}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 }
