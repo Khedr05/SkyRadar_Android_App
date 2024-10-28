@@ -3,6 +3,7 @@ package com.example.skyradar.home.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.skyradar.model.DatabasePojo
 import com.example.skyradar.model.ForecastResponse
 import com.example.skyradar.model.Repository
 import com.example.skyradar.model.WeatherResponse
@@ -69,8 +70,7 @@ class HomeViewModel(private val _repo: Repository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _repo.getForecastData(latitude, longitude, units, lang).collect { weatherDataRoot ->
-                    Log.i("TestingApiViewModel", "Forecast data fetched successfully: ${weatherDataRoot.city.name}")
-
+                    Log.i("TestingApiViewModel", "Forecast data fetched successfully: ${weatherDataRoot.city?.name ?: "N/A"}")
                     // Post the entire Root object wrapped in ResponseStatus.Success
                     _forecastData.value = ResponseStatus.Success(weatherDataRoot)
                 }
@@ -78,6 +78,13 @@ class HomeViewModel(private val _repo: Repository) : ViewModel() {
                 _forecastError.value = "Error while fetching weather data: ${e.message}"
                 Log.i("TestingApiViewModel", "Error while fetching forecast data: ${e.message}")
             }
+        }
+    }
+
+    // Method to add a location to favorites
+    fun addFavoriteLocation(location: DatabasePojo) {
+        viewModelScope.launch {
+            _repo.addFavorite(location)
         }
     }
 }

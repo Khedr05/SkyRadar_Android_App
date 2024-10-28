@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "favorites_table")
 data class DatabasePojo(
-    @PrimaryKey val locationName: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     @Embedded
-    val Weather: WeatherResponse,
+    var Weather: WeatherResponse,
     @Embedded
-    val Forecast: ForecastResponse
+    var Forecast: ForecastResponse
 )

@@ -197,15 +197,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateWeatherUI(requestedData: WeatherResponse) {
-        uiElements["cityName"]?.text = requestedData.name
-        uiElements["currentTempValue"]?.text = "${requestedData.main.temp} °C"
-        uiElements["weatherValue"]?.text = requestedData.weather[0].description.capitalize()
-        uiElements["humidityValue"]?.text = "${requestedData.main.humidity}%"
-        uiElements["pressureValue"]?.text = "${requestedData.main.pressure} hPa"
-        uiElements["tempMaxValue"]?.text = "${requestedData.main.tempMax} °C"
-        uiElements["tempMinValue"]?.text = "${requestedData.main.tempMin} °C"
-        uiElements["windSpeedValue"]?.text = "${requestedData.wind.speed} m/s"
-        uiElements["cloudsValue"]?.text = "${requestedData.clouds.all} %"
+        uiElements["cityName"]?.text = requestedData.name ?: "N/A"
+        uiElements["currentTempValue"]?.text = "${requestedData.main?.temp ?: "N/A"} °C"
+        uiElements["weatherValue"]?.text = requestedData.weather?.get(0)?.description?.capitalize() ?: "N/A"
+        uiElements["humidityValue"]?.text = "${requestedData.main?.humidity ?: "N/A"}%"
+        uiElements["pressureValue"]?.text = "${requestedData.main?.pressure ?: "N/A"} hPa"
+        uiElements["tempMaxValue"]?.text = "${requestedData.main?.tempMax ?: "N/A"} °C"
+        uiElements["tempMinValue"]?.text = "${requestedData.main?.tempMin ?: "N/A"} °C"
+        uiElements["windSpeedValue"]?.text = "${requestedData.wind?.speed ?: "N/A"} m/s"
+        uiElements["cloudsValue"]?.text = "${requestedData.clouds?.all ?: "N/A"} %"
     }
 
     private fun showSnackbar(message: String) {

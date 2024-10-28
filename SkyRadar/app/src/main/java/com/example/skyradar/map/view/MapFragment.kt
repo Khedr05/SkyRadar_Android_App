@@ -15,7 +15,6 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import com.example.skyradar.R
-import com.example.skyradar.WeatherDetailsFragment
 import com.example.skyradar.map.viewmodel.MapFactory
 import com.example.skyradar.map.viewmodel.MapViewModel
 import org.osmdroid.config.Configuration
@@ -171,7 +170,7 @@ class MapFragment : Fragment() {
     }
 
     private fun showWeatherDetailsFragment(latitude: Double, longitude: Double) {
-        val weatherFragment = WeatherDetailsFragment()
+        val weatherFragment = MapWeatherDetailsFragment()
         val bundle = Bundle().apply {
             putDouble("LATITUDE", latitude)
             putDouble("LONGITUDE", longitude)

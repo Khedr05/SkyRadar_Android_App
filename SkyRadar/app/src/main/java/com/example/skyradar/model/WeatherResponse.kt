@@ -5,25 +5,25 @@ import androidx.room.Embedded
 
 data class WeatherResponse(
     @Embedded(prefix = "coord_")
-    val coord: Coord,
-    val weather: List<Weather>,
-    val base: String,
+    val coord: Coord? = null,
+    val weather: List<Weather>? = null,
+    val base: String? = null,
     @Embedded(prefix = "main_")
-    val main: Main,
-    val visibility: Int,
+    val main: Main? = null,
+    val visibility: Int? = null,
     @Embedded(prefix = "wind_")
-    val wind: Wind,
+    val wind: Wind? = null,
     @Embedded(prefix = "clouds_")
-    val clouds: Clouds,
-    val dt: Long,
+    val clouds: Clouds? = null,
+    val dt: Long? = null,
     @Embedded(prefix = "sys_")
-    val sys: Sys,
+    val sys: Sys? = null,
     @ColumnInfo(name = "weather_timezone")
-    val timezone: Int,
+    val timezone: Int? = null,
     @ColumnInfo(name = "weather_id")
-    val id: Int,
+    val id: Int? = null,
     @ColumnInfo(name = "weather_name")
-    val name: String,
+    val name: String? = null,
     @ColumnInfo(name = "weather_cod")
-    val cod: Int
+    val cod: Int? = null
 )

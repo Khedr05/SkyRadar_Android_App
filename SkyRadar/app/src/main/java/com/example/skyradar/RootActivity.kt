@@ -8,8 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.skyradar.favouritesLocations.view.FavouritesLocationsFragment
 import com.example.skyradar.map.view.MapFragment
 import com.example.skyradar.home.view.HomeFragment
+import com.example.skyradar.settings.view.SettingsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RootActivity : AppCompatActivity() {
@@ -21,6 +23,8 @@ class RootActivity : AppCompatActivity() {
     private lateinit var menuFloatingActionButton: FloatingActionButton
     private lateinit var homeFloatingActionButton: FloatingActionButton
     private lateinit var mapFloatingActionButton: FloatingActionButton
+    private lateinit var favFloatingActionButton: FloatingActionButton
+    private lateinit var settingsFloatingActionButton: FloatingActionButton
     private var clicked = false
 
 
@@ -33,6 +37,8 @@ class RootActivity : AppCompatActivity() {
         menuFloatingActionButton = findViewById(R.id.menuFloatingActionButton)
         homeFloatingActionButton = findViewById(R.id.HomeFloatingActionButton)
         mapFloatingActionButton = findViewById(R.id.MapFloatingActionButton)
+        favFloatingActionButton = findViewById(R.id.FavFloatingActionButton)
+        settingsFloatingActionButton = findViewById(R.id.SettingsFloatingActionButton)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -52,6 +58,12 @@ class RootActivity : AppCompatActivity() {
 
         mapFloatingActionButton.setOnClickListener {
             onMapButtonClicked()
+        }
+        favFloatingActionButton.setOnClickListener {
+            onFavButtonClicked()
+        }
+        settingsFloatingActionButton.setOnClickListener {
+            onSettingsButtonClicked()
         }
     }
 
@@ -78,13 +90,33 @@ class RootActivity : AppCompatActivity() {
             .commit()
     }
 
+    private fun onFavButtonClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, FavouritesLocationsFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun onSettingsButtonClicked() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, SettingsFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+
+
     private fun setVisibility(clicked: Boolean) {
         if(!clicked){
             homeFloatingActionButton.visibility = View.VISIBLE
             mapFloatingActionButton.visibility = View.VISIBLE
+            favFloatingActionButton.visibility = View.VISIBLE
+            settingsFloatingActionButton.visibility = View.VISIBLE
         } else {
             homeFloatingActionButton.visibility = View.INVISIBLE
             mapFloatingActionButton.visibility = View.INVISIBLE
+            favFloatingActionButton.visibility = View.INVISIBLE
+            settingsFloatingActionButton.visibility = View.INVISIBLE
         }
     }
 
@@ -93,10 +125,14 @@ class RootActivity : AppCompatActivity() {
             menuFloatingActionButton.startAnimation(rotateOpenAnim)
             homeFloatingActionButton.startAnimation(fromBottomAnim)
             mapFloatingActionButton.startAnimation(fromBottomAnim)
+            favFloatingActionButton.startAnimation(fromBottomAnim)
+            settingsFloatingActionButton.startAnimation(fromBottomAnim)
         } else {
             menuFloatingActionButton.startAnimation(rotateCloseAnim)
             homeFloatingActionButton.startAnimation(toBottomAnim)
             mapFloatingActionButton.startAnimation(toBottomAnim)
+            favFloatingActionButton.startAnimation(toBottomAnim)
+            settingsFloatingActionButton.startAnimation(toBottomAnim)
         }
     }
 
@@ -104,9 +140,13 @@ class RootActivity : AppCompatActivity() {
         if(!clicked){
             homeFloatingActionButton.isClickable = true
             mapFloatingActionButton.isClickable = true
+            favFloatingActionButton.isClickable = true
+            settingsFloatingActionButton.isClickable = true
         } else {
             homeFloatingActionButton.isClickable = false
             mapFloatingActionButton.isClickable = false
+            favFloatingActionButton.isClickable = false
+            settingsFloatingActionButton.isClickable = false
         }
     }
 
