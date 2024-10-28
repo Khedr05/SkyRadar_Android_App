@@ -29,6 +29,7 @@ import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import android.app.AlertDialog
+import com.example.skyradar.database.LocationLocalDataSourceImpl
 
 class HomeFragment : Fragment() {
 
@@ -79,7 +80,8 @@ class HomeFragment : Fragment() {
 
     private fun initializeViewModel() {
         val factory = HomeFactory(
-            RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit))
+            RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
+                LocationLocalDataSourceImpl.getInstance(requireContext()))
         )
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
     }

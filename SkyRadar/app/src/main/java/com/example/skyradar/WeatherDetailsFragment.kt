@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.skyradar.database.LocationLocalDataSourceImpl
 import com.example.skyradar.model.ForecastResponse
 import com.example.skyradar.model.RepositoryImpl
 import com.example.skyradar.model.WeatherResponse
@@ -71,7 +72,8 @@ class WeatherDetailsFragment : Fragment() {
 
     private fun initializeViewModel() {
         val factory = HomeFactory(
-            RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit))
+            RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
+                LocationLocalDataSourceImpl.getInstance(requireContext()))
         )
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
     }

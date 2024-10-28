@@ -1,11 +1,14 @@
 package com.example.skyradar.model
 
+import com.example.skyradar.database.LocationLocalDataSource
+import com.example.skyradar.database.LocationLocalDataSourceImpl
 import com.example.skyradar.network.RemoteDataSourceImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class RepositoryImpl(
-    private val remoteDataSource: RemoteDataSourceImpl
+    private val remoteDataSource: RemoteDataSourceImpl,
+    private val localDataSource: LocationLocalDataSource
 ) : Repository {
 
     // Fetch weather data by latitude and longitude
@@ -84,5 +87,17 @@ class RepositoryImpl(
         } else {
             throw Exception("Failed to fetch weather data: ${response.errorBody()?.string()}")
         }
+    }
+
+    override suspend fun addFavorite(location: DatabasePojo) {
+        localDataSource.addFavorite(location)
+    }
+
+    override suspend fun removeFavorite(location: DatabasePojo) {
+        localDataSource.removeFavorite(location)
+    }
+
+    override fun getFavoriteLocations(): Flow<List<DatabasePojo>> {
+        return localDataSource.getFavoriteLocations()
     }
 }
