@@ -10,7 +10,5 @@ class MapViewModel : ViewModel() {
     private val _selectedLocation = MutableStateFlow<GeoPoint?>(null)
     val selectedLocation: StateFlow<GeoPoint?> get() = _selectedLocation
 
-    fun updateSelectedLocation(location: GeoPoint) {
-        _selectedLocation.value = location
-    }
+
 }
