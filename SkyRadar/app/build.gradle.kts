@@ -7,7 +7,6 @@ plugins {
 android {
     namespace = "com.example.skyradar"
     compileSdk = 34
-
     defaultConfig {
         applicationId = "com.example.skyradar"
         minSdk = 24
@@ -75,4 +74,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-geopackage:6.1.11")
     implementation("org.osmdroid:osmdroid-mapsforge:6.1.11")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    //material design
+    implementation ("com.google.android.material:material:1.12.0")
 }
