@@ -73,7 +73,7 @@
         app:srcCompat="@drawable/love" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/SettingsFloatingActionButton"
+        android:id="@+id/AlarmFloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -84,6 +84,20 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/FavFloatingActionButton"
         app:layout_constraintEnd_toEndOf="@+id/FavFloatingActionButton"
+        app:srcCompat="@drawable/alarm" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/SettingsFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/white"
+        android:tint="@color/black"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/AlarmFloatingActionButton"
+        app:layout_constraintEnd_toEndOf="@+id/AlarmFloatingActionButton"
         app:srcCompat="@drawable/settings" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
