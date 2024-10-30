@@ -21,12 +21,13 @@ class AlarmReceiver : BroadcastReceiver() {
         // Wake up the screen
         wakeUpScreen(context)
 
-        // Create notification channel for devices running Android O and above
+        // Check if notification channel exists and create if needed
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "alarm_channel"
             val name = "Alarm Notifications"
             val descriptionText = "Channel for alarm notifications"
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("alarm_channel", name, importance).apply {
+            val channel = NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
             }
             val notificationManager: NotificationManager =
@@ -41,12 +42,15 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentTitle("Alarm Notification")
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(soundUri) // Set the default notification sound
-            .setAutoCancel(true) // Dismiss notification when tapped
+            .setSound(soundUri)
+            .setAutoCancel(true)
 
+        // Show the notification
         with(NotificationManagerCompat.from(context)) {
             notify(1, builder.build())
         }
+
+        Log.d("AlarmReceiver", "Notification sent with message: $message")
     }
 
     private fun wakeUpScreen(context: Context) {
@@ -55,10 +59,8 @@ class AlarmReceiver : BroadcastReceiver() {
             PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
             "skyradar:alarm_wakelock"
         )
-        wakeLock.acquire(5000) // Wake screen for 5 seconds
-
-        // Log to check if the wake lock is acquired
+        wakeLock.acquire(5000)
         Log.d("AlarmReceiver", "Wake lock acquired to wake up screen")
     }
-
 }
+
