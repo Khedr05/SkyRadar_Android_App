@@ -5,7 +5,4 @@
     <color name="fillCard">#6679747E</color>
     <color name="buttons_">#0A679B</color>
     <color name="delete_color">#FF0000</color>
-    <color name="primaryColor">#FF6200EE</color>
-    <color name="primaryTextColor">#000000</color>
-    <color name="primaryLightColor">#D1C4E9</color>
 </resources>

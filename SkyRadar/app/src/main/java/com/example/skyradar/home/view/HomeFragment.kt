@@ -33,13 +33,22 @@ import android.util.Log
 import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import java.util.Locale
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
+import android.widget.ProgressBar
+import com.example.skyradar.Helpers.formatTimestamp
+import java.util.Date
 
 class HomeFragment : Fragment() {
 
-    private lateinit var homeAdapter: HomeAdapter
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var dailyAdapter: DailyAdapter
+    private lateinit var hourlyAdapter: HourlyAdapter
+    private lateinit var rvHourly: RecyclerView
+    private lateinit var rvDaily: RecyclerView
     private lateinit var viewModel: HomeViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var progressBarHourly: ProgressBar
+    private lateinit var progressBarDaily: ProgressBar
 
     private val uiElements: MutableMap<String, TextView> = mutableMapOf()
 
@@ -86,16 +95,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializeUI(view: View) {
-        recyclerView = view.findViewById(R.id.recyclerView)
-        uiElements["cityName"] = view.findViewById(R.id.textView)
-        uiElements["currentTempValue"] = view.findViewById(R.id.currentTempValue)
-        uiElements["weatherValue"] = view.findViewById(R.id.weatherValue)
-        uiElements["humidityValue"] = view.findViewById(R.id.humidityValue)
-        uiElements["pressureValue"] = view.findViewById(R.id.pressureValue)
-        uiElements["tempMaxValue"] = view.findViewById(R.id.tempMaxValue)
-        uiElements["tempMinValue"] = view.findViewById(R.id.tempMinValue)
-        uiElements["windSpeedValue"] = view.findViewById(R.id.windSpeedValue)
-        uiElements["cloudsValue"] = view.findViewById(R.id.cloudsValue)
+        rvHourly = view.findViewById(R.id.rv_hourly_degrees)
+        rvDaily = view.findViewById(R.id.rv_detailed_days)
+        progressBarHourly = view.findViewById(R.id.progressBarHourly)
+        progressBarDaily = view.findViewById(R.id.progressBarDaily)
+        uiElements["cityName"] = view.findViewById(R.id.tv_city_name)
+        uiElements["date"] = view.findViewById(R.id.tv_date)
+        uiElements["currentTempValue"] = view.findViewById(R.id.tv_current_degree)
+        uiElements["weatherValue"] = view.findViewById(R.id.tv_weather_status)
+        uiElements["tempMaxValue"] = view.findViewById(R.id.tv_temp_max)
+        uiElements["tempMinValue"] = view.findViewById(R.id.tv_temp_min)
+        uiElements["humidityValue"] = view.findViewById(R.id.tv_humidity_value)
+        uiElements["pressureValue"] = view.findViewById(R.id.tv_pressure_value)
+        uiElements["windSpeedValue"] = view.findViewById(R.id.tv_wind_value)
+        uiElements["cloudsValue"] = view.findViewById(R.id.tv_cloud_value)
+        uiElements["sunriseValue"] = view.findViewById(R.id.tv_sunrise_value)
+        uiElements["sunsetValue"] = view.findViewById(R.id.tv_sunset_value)
     }
 
     private fun initializeViewModel() {
@@ -108,9 +123,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        homeAdapter = HomeAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = homeAdapter
+        hourlyAdapter = HourlyAdapter()
+        rvHourly.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        rvHourly.adapter = hourlyAdapter
+        dailyAdapter = DailyAdapter()
+        rvDaily.layoutManager = LinearLayoutManager(requireContext())
+        rvDaily.adapter = dailyAdapter
     }
 
     private fun checkLocationEnabled() {
@@ -200,38 +218,77 @@ class HomeFragment : Fragment() {
 
     private fun handleWeatherResponse(state: ResponseStatus<*>) {
         when (state) {
-            is ResponseStatus.Loading -> {}
+            is ResponseStatus.Loading -> {
+                // Show progress bar and hide UI elements
+                progressBarHourly.visibility = View.VISIBLE
+                progressBarDaily.visibility = View.VISIBLE
+                uiElements.values.forEach { it.visibility = View.GONE }
+            }
             is ResponseStatus.Success<*> -> {
+                // Hide progress bar and show UI elements
+                progressBarHourly.visibility = View.GONE
+                progressBarDaily.visibility = View.GONE
                 when (val requestedData = state.requestedData) {
-                    is WeatherResponse -> updateWeatherUI(requestedData)
+                    is WeatherResponse -> {
+                        updateWeatherUI(requestedData)
+                        uiElements.values.forEach { it.visibility = View.VISIBLE }
+                    }
                 }
             }
-            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
+            is ResponseStatus.Failure -> {
+                // Hide progress bar and show error message
+                progressBarHourly.visibility = View.GONE
+                progressBarDaily.visibility = View.GONE
+                showSnackbar("Error: ${state.errorMessage}")
+            }
         }
     }
 
     private fun handleForecastResponse(state: ResponseStatus<*>) {
         when (state) {
-            is ResponseStatus.Loading -> {}
+            is ResponseStatus.Loading -> {
+                // Show progress bar and hide UI elements
+                progressBarHourly.visibility = View.VISIBLE
+                progressBarDaily.visibility = View.VISIBLE
+                uiElements.values.forEach { it.visibility = View.GONE }
+            }
             is ResponseStatus.Success<*> -> {
+                // Hide progress bar and show UI elements
+                progressBarHourly.visibility = View.GONE
+                progressBarDaily.visibility = View.GONE
                 when (val requestedData = state.requestedData) {
-                    is ForecastResponse -> homeAdapter.submitList(requestedData.list)
+                    is ForecastResponse -> {
+                        requestedData.list?.let { dailyAdapter.submitWeatherList(it) }
+                        requestedData.list?.let { hourlyAdapter.submitTodayWeather(it) }
+                        uiElements.values.forEach { it.visibility = View.VISIBLE }
+                    }
                 }
             }
-            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
+            is ResponseStatus.Failure -> {
+                // Hide progress bar and show error message
+                progressBarHourly.visibility = View.GONE
+                progressBarDaily.visibility = View.GONE
+                showSnackbar("Error: ${state.errorMessage}")
+            }
         }
     }
 
+
     private fun updateWeatherUI(requestedData: WeatherResponse) {
-        uiElements["cityName"]?.text = requestedData.name ?: "N/A"
-        uiElements["currentTempValue"]?.text = "${requestedData.main?.temp ?: "N/A"} °C"
-        uiElements["weatherValue"]?.text = requestedData.weather?.get(0)?.description?.capitalize() ?: "N/A"
-        uiElements["humidityValue"]?.text = "${requestedData.main?.humidity ?: "N/A"}%"
-        uiElements["pressureValue"]?.text = "${requestedData.main?.pressure ?: "N/A"} hPa"
-        uiElements["tempMaxValue"]?.text = "${requestedData.main?.tempMax ?: "N/A"} °C"
-        uiElements["tempMinValue"]?.text = "${requestedData.main?.tempMin ?: "N/A"} °C"
-        uiElements["windSpeedValue"]?.text = "${requestedData.wind?.speed ?: "N/A"} m/s"
-        uiElements["cloudsValue"]?.text = "${requestedData.clouds?.all ?: "N/A"} %"
+
+        uiElements["date"]?.text = getCurrentDate()
+        uiElements["cityName"]?.text = requestedData.name
+        uiElements["currentTempValue"]?.text = requestedData.main?.temp.toString()
+        uiElements["weatherValue"]?.text = requestedData.weather?.get(0)?.description?.capitalize()
+        uiElements["humidityValue"]?.text = requestedData.main?.humidity.toString()
+        uiElements["pressureValue"]?.text = requestedData.main?.pressure.toString()
+        uiElements["tempMaxValue"]?.text = requestedData.main?.tempMax.toString()
+        uiElements["tempMinValue"]?.text = requestedData.main?.tempMin.toString()
+        uiElements["windSpeedValue"]?.text = requestedData.wind?.speed.toString()
+        uiElements["cloudsValue"]?.text = requestedData.clouds?.all.toString()
+        uiElements["sunriseValue"]?.text = formatTimestamp(requestedData.sys?.sunrise)
+        uiElements["sunsetValue"]?.text = formatTimestamp(requestedData.sys?.sunset)
+
     }
 
     private fun showSnackbar(message: String) {
@@ -249,6 +306,12 @@ class HomeFragment : Fragment() {
         } else {
             showSnackbar("Location permission is required to get your current weather.")
         }
+    }
+
+
+    private fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
+        return dateFormat.format(Date())
     }
 
     companion object {

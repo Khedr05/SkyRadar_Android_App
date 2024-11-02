@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/gradient_background"
     android:gravity="center">
 
     <ImageButton
@@ -12,6 +13,7 @@
         android:src="@drawable/add_alarm"
         android:contentDescription="show_time_picker"
         android:background="?attr/selectableItemBackground"
+        android:backgroundTint="@color/white"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp" />
 
