@@ -12,6 +12,7 @@ interface Repository {
      suspend fun removeFavorite(location: DatabasePojo)
      fun getFavoriteLocations(): Flow<List<DatabasePojo>>
      suspend fun insertAlarm(alarm: Alarm)
+     suspend fun deleteAlarm(alarm: Alarm)
      fun getAlarms(): Flow<List<Alarm>>
      fun saveLanguage(language: String)
      fun saveUnit(unit: String)

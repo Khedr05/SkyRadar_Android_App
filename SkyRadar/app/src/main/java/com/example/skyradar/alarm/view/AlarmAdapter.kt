@@ -15,6 +15,7 @@ class AlarmAdapter(private var alarms: List<Alarm>) :
 
     class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val alarmTimeTextView: TextView = itemView.findViewById(R.id.alarmTimeTextView)
+        val alarmDateTextView: TextView = itemView.findViewById(R.id.alarmDateTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmViewHolder {
@@ -24,9 +25,12 @@ class AlarmAdapter(private var alarms: List<Alarm>) :
 
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {
         val alarm = alarms[position]
-        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val formattedTime = dateFormat.format(Date(alarm.timeInMillis))
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formattedTime = timeFormat.format(Date(alarm.timeInMillis))
+        val formattedDate = dateFormat.format(Date(alarm.timeInMillis))
         holder.alarmTimeTextView.text = formattedTime
+        holder.alarmDateTextView.text = formattedDate
     }
 
     override fun getItemCount() = alarms.size

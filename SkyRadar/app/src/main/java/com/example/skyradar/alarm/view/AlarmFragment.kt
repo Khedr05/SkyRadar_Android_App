@@ -18,8 +18,6 @@ import com.example.skyradar.alarm.viewmodel.AlarmViewModel
 import com.example.skyradar.alarm.viewmodel.AlarmViewModelFactory
 import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
-import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModel
-import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModelFactory
 import com.example.skyradar.model.Alarm
 import com.example.skyradar.model.RepositoryImpl
 import com.example.skyradar.network.RemoteDataSourceImpl

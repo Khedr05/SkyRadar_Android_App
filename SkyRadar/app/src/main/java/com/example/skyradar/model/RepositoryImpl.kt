@@ -112,6 +112,10 @@ class RepositoryImpl(
         alarmLocalDataSource.insertAlarm(alarm)
     }
 
+    override suspend fun deleteAlarm(alarm: Alarm) {
+        alarmLocalDataSource.deleteAlarm(alarm)
+    }
+
     override fun getAlarms(): Flow<List<Alarm>> {
         return alarmLocalDataSource.getAlarms()
     }

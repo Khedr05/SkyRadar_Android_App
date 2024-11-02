@@ -12,6 +12,10 @@ class AlarmLocalDataSourceImpl(private val context: Context) : AlarmLocalDataSou
         alarmDao.insert(alarm)
     }
 
+    override suspend fun deleteAlarm(alarm: Alarm) {
+        alarmDao.deleteAlarm(alarm)
+    }
+
     override fun getAlarms(): Flow<List<Alarm>> {
         return alarmDao.getAlarms()
     }
@@ -29,5 +33,5 @@ class AlarmLocalDataSourceImpl(private val context: Context) : AlarmLocalDataSou
             }
         }
     }
-    
+
 }

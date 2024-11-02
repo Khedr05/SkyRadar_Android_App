@@ -3,7 +3,6 @@ package com.example.skyradar.alarm.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.skyradar.model.Alarm
-import com.example.skyradar.model.DatabasePojo
 import com.example.skyradar.model.Repository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +33,13 @@ class AlarmViewModel(private val _repo: Repository) : ViewModel() {
     fun insertAlarm(alarm: Alarm){
         viewModelScope.launch {
             _repo.insertAlarm(alarm)
+            fetchAlarm() // Refresh favorite locations
+        }
+    }
+
+    fun deleteAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            _repo.deleteAlarm(alarm)
             fetchAlarm() // Refresh favorite locations
         }
     }
