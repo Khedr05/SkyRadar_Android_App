@@ -8,10 +8,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.skyradar.MyApplication
+import com.example.skyradar.database.AlarmLocalDataSource
 
 class RepositoryImpl(
     private val remoteDataSource: RemoteDataSourceImpl,
-    private val localDataSource: LocationLocalDataSource
+    private val localDataSource: LocationLocalDataSource,
+    private val alarmLocalDataSource: AlarmLocalDataSource
 ) : Repository {
 
     private val sharedPreferences: SharedPreferences = MyApplication.context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
@@ -104,6 +106,14 @@ class RepositoryImpl(
 
     override fun getFavoriteLocations(): Flow<List<DatabasePojo>> {
         return localDataSource.getFavoriteLocations()
+    }
+
+    override suspend fun insertAlarm(alarm: Alarm) {
+        alarmLocalDataSource.insertAlarm(alarm)
+    }
+
+    override fun getAlarms(): Flow<List<Alarm>> {
+        return alarmLocalDataSource.getAlarms()
     }
 
     override fun saveLanguage(language: String) {

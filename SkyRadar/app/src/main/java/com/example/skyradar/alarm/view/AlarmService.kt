@@ -21,8 +21,8 @@ class AlarmService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
             val notification = NotificationCompat.Builder(this, "ALARM_SERVICE_CHANNEL")
-                .setContentTitle("Alarm is Running")
-                .setContentText("Alarm sound is playing")
+                //.setContentTitle("Alarm is Running")
+                //.setContentText("Alarm sound is playing")
                 .setSmallIcon(R.drawable.home)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()

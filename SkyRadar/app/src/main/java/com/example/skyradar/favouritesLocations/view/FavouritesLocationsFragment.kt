@@ -10,10 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skyradar.R
+import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModel
 import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModelFactory
-import com.example.skyradar.model.DatabasePojo
 import com.example.skyradar.model.RepositoryImpl
 import com.example.skyradar.network.RemoteDataSourceImpl
 import com.example.skyradar.network.RetrofitInstance
@@ -32,7 +32,8 @@ class FavouritesLocationsFragment : Fragment(){
         val factory = FavouritesLocationsViewModelFactory(
             RepositoryImpl(
                 RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
-                LocationLocalDataSourceImpl.getInstance(requireContext())
+                LocationLocalDataSourceImpl.getInstance(requireContext()),
+                AlarmLocalDataSourceImpl.getInstance(requireContext())
             )
         )
         viewModel = ViewModelProvider(this, factory).get(FavouritesLocationsViewModel::class.java)

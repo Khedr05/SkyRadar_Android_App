@@ -5,18 +5,16 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:timePickerMode="spinner"
-        android:layout_gravity="center"/>
-
     <Button
-        android:id="@+id/setAlarmButton"
+        android:id="@+id/showTimePickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Alarm"
+        android:text="Show Time Picker"
         android:layout_marginTop="20dp"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/alarmRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

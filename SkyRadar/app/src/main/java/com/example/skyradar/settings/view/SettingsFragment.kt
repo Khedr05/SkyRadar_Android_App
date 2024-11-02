@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.skyradar.R
+import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import com.example.skyradar.databinding.FragmentSettingsBinding
 import com.example.skyradar.model.RepositoryImpl
@@ -17,9 +18,7 @@ import com.example.skyradar.network.RemoteDataSourceImpl
 import com.example.skyradar.network.RetrofitInstance
 import com.example.skyradar.settings.viewmodel.SettingsFactory
 import com.example.skyradar.settings.viewmodel.SettingsViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class SettingsFragment : Fragment() {
 
@@ -40,7 +39,8 @@ class SettingsFragment : Fragment() {
         val factory = SettingsFactory(
             RepositoryImpl(
                 RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
-                LocationLocalDataSourceImpl.getInstance(requireContext())
+                LocationLocalDataSourceImpl.getInstance(requireContext()),
+                AlarmLocalDataSourceImpl.getInstance(requireContext())
             )
         )
 
