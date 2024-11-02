@@ -5,12 +5,15 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <Button
+    <ImageButton
         android:id="@+id/showTimePickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Time Picker"
-        android:layout_marginTop="20dp"/>
+        android:src="@drawable/add_alarm"
+        android:contentDescription="show_time_picker"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/alarmRecyclerView"

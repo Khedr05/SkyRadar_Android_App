@@ -33,11 +33,14 @@ class AlarmAdapter(private var alarms: List<Alarm>) :
         holder.alarmDateTextView.text = formattedDate
     }
 
-
     override fun getItemCount() = alarms.size
 
     fun updateAlarms(newAlarms: List<Alarm>) {
         alarms = newAlarms
         notifyDataSetChanged()
+    }
+
+    fun getAlarmAtPosition(position: Int): Alarm {
+        return alarms[position]
     }
 }
