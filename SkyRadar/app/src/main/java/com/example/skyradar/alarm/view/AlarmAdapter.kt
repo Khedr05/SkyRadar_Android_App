@@ -25,13 +25,14 @@ class AlarmAdapter(private var alarms: List<Alarm>) :
 
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {
         val alarm = alarms[position]
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())  // 12-hour format with AM/PM
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val formattedTime = timeFormat.format(Date(alarm.timeInMillis))
         val formattedDate = dateFormat.format(Date(alarm.timeInMillis))
         holder.alarmTimeTextView.text = formattedTime
         holder.alarmDateTextView.text = formattedDate
     }
+
 
     override fun getItemCount() = alarms.size
 

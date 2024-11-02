@@ -72,13 +72,18 @@ class AlarmFragment : Fragment(R.layout.fragment_alarm) {
         val minute = calendar.get(Calendar.MINUTE)
 
         val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+            // Adjust for 12-hour format and AM/PM
+            val isPM = selectedHour >= 12
+            val adjustedHour = if (selectedHour % 12 == 0) 12 else selectedHour % 12  // Ensure hour is 1-12
+
             val alarmTime = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, selectedHour)
+                set(Calendar.HOUR, adjustedHour)
                 set(Calendar.MINUTE, selectedMinute)
                 set(Calendar.SECOND, 0)
+                set(Calendar.AM_PM, if (isPM) Calendar.PM else Calendar.AM)
             }
             setAlarm(alarmTime.timeInMillis)
-        }, hour, minute, true)
+        }, hour, minute, false)  // Set to 12-hour format
 
         timePickerDialog.show()
     }
