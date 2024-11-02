@@ -87,4 +87,20 @@ class HomeViewModel(private val _repo: Repository) : ViewModel() {
             _repo.addFavorite(location)
         }
     }
+
+    fun setLanguage(language: String) {
+        _repo.saveLanguage(language)
+    }
+
+    fun setUnit(unit: String) {
+        _repo.saveUnit(unit)
+    }
+
+    fun getLanguage(): String? {
+        return _repo.getLanguage()
+    }
+
+    fun getUnit(): String? {
+        return _repo.getUnit()
+    }
 }

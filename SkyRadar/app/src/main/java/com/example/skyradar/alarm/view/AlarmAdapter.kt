@@ -27,10 +27,10 @@ class AlarmAdapter(
             val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
             tvAlarmTime.text = String.format("%02d:%02d %s", hour, minute, amPm)
 
-            switchAlarm.isChecked = alarm.isActive // Reflect the active state
+            switchAlarm.isChecked = alarm.isActive
 
             switchAlarm.setOnCheckedChangeListener { _, isChecked ->
-                onToggleListener(alarm, isChecked) // Pass the alarm and its new state
+                onToggleListener(alarm, isChecked)
             }
         }
     }

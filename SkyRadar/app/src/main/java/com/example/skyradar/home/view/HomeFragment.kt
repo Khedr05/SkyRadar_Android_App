@@ -29,7 +29,9 @@ import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import android.app.AlertDialog
+import android.util.Log
 import com.example.skyradar.database.LocationLocalDataSourceImpl
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -53,11 +55,28 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeUI(view)
         initializeViewModel()
+        initializeSettings()
         setupRecyclerView()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         observeViewModel()
         checkLocationEnabled()
+    }
+
+    private fun initializeSettings() {
+        val unit: String? = viewModel.getUnit()
+        val language: String? = viewModel.getLanguage()
+
+        if(unit == null){
+            viewModel.setUnit("metric")
+        }else{/* Do Nothing */}
+
+        if(language == null || language == "Default Mobile Language"){
+
+            val deviceLanguage = Locale.getDefault().language
+            Log.i("ello8a", "Device Language: $deviceLanguage")
+            viewModel.setLanguage(deviceLanguage)
+        }else{/* Do Nothing */}
     }
 
     override fun onResume() {
@@ -159,8 +178,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun fetchWeatherData(location: android.location.Location) {
-        viewModel.fetchForecastData(location.latitude.toString(), location.longitude.toString(), "metric", "en")
-        viewModel.fetchWeatherData(location.latitude.toString(), location.longitude.toString(), "metric", "en")
+
+        var lang : String? = viewModel.getLanguage()
+        var unit : String? = viewModel.getUnit()
+        Log.i("TestingApiViewModel", "Language: $lang")
+
+        viewModel.fetchWeatherData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
+        viewModel.fetchForecastData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
     }
 
     private fun observeViewModel() {
