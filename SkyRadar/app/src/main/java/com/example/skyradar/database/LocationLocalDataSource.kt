@@ -8,4 +8,5 @@ interface LocationLocalDataSource {
     fun getFavoriteLocations(): Flow<List<DatabasePojo>>
     suspend fun addFavorite(location: DatabasePojo)
     suspend fun removeFavorite(location: DatabasePojo)
+    suspend fun updateFavorite(location: DatabasePojo)
 }

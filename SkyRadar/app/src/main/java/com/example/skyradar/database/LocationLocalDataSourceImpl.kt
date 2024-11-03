@@ -21,6 +21,10 @@ class LocationLocalDataSourceImpl(private val context: Context) : LocationLocalD
         return locationsDao.deleteCurrentLocation(location)
     }
 
+    override suspend fun updateFavorite(location: DatabasePojo) {
+        return locationsDao.updateLocation(location)
+    }
+
 
     companion object {
         @Volatile

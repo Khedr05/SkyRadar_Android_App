@@ -10,6 +10,7 @@ interface Repository {
      fun getWeatherDataByCityName(cityName: String, units: String, lang: String): Flow<WeatherResponse>
      suspend fun addFavorite(location: DatabasePojo)
      suspend fun removeFavorite(location: DatabasePojo)
+     suspend fun updateFavorite(location: DatabasePojo)
      fun getFavoriteLocations(): Flow<List<DatabasePojo>>
      suspend fun insertAlarm(alarm: Alarm)
      suspend fun deleteAlarm(alarm: Alarm)

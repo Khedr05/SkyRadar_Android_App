@@ -104,6 +104,10 @@ class RepositoryImpl(
         localDataSource.removeFavorite(location)
     }
 
+    override suspend fun updateFavorite(location: DatabasePojo) {
+        localDataSource.updateFavorite(location)
+    }
+
     override fun getFavoriteLocations(): Flow<List<DatabasePojo>> {
         return localDataSource.getFavoriteLocations()
     }

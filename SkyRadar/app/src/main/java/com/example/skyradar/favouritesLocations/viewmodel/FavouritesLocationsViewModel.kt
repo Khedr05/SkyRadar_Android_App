@@ -35,4 +35,12 @@ class FavouritesLocationsViewModel(private val _repo: Repository) : ViewModel() 
             fetchFavoriteLocations() // Refresh favorite locations
         }
     }
+
+    // Method to update a location to favorites
+    fun updateFavoriteLocation(location: DatabasePojo) {
+        viewModelScope.launch {
+            _repo.updateFavorite(location)
+            fetchFavoriteLocations() // Refresh favorite locations
+        }
+        }
 }
