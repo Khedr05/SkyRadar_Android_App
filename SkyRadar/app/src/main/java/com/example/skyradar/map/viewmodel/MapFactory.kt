@@ -2,13 +2,20 @@ package com.example.skyradar.map.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.skyradar.home.viewmodel.HomeViewModel
+import com.example.skyradar.model.Repository
 
-class MapFactory : ViewModelProvider.Factory {
+
+class MapFactory(
+    private val _repo: Repository
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel() as T
+        return if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
+            MapViewModel(_repo) as T
+        } else {
+            throw IllegalArgumentException("ViewModel class not found")
         }
-        throw IllegalArgumentException("view model not found")
     }
 }

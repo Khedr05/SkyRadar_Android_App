@@ -3,6 +3,7 @@ package com.example.skyradar
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import java.util.Date
+import java.util.Locale
 
 object Helpers {
 
@@ -24,6 +25,11 @@ object Helpers {
         val calendar = java.util.Calendar.getInstance()
         calendar.time = date
         return calendar.get(java.util.Calendar.HOUR_OF_DAY)  // Get hour in 24-hour format
+    }
+
+     fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
+        return dateFormat.format(Date())
     }
 
 }

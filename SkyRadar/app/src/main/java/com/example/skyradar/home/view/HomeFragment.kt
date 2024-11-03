@@ -34,9 +34,9 @@ import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import java.util.Locale
 import android.icu.text.SimpleDateFormat
-import android.icu.util.TimeZone
 import android.widget.ProgressBar
 import com.example.skyradar.Helpers.formatTimestamp
+import com.example.skyradar.Helpers.getCurrentDate
 import java.util.Date
 
 class HomeFragment : Fragment() {
@@ -278,11 +278,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-    private fun getCurrentDate(): String {
-        val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
-        return dateFormat.format(Date())
-    }
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
