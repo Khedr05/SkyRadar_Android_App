@@ -201,7 +201,7 @@ class HomeFragment : Fragment() {
 
         var lang : String? = viewModel.getLanguage()
         var unit : String? = viewModel.getUnit()
-        Log.i("TestingApiViewModel", "Language: $lang")
+        Log.i("hia de", "Language: $lang")
 
         viewModel.fetchWeatherData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
         viewModel.fetchForecastData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
@@ -218,58 +218,28 @@ class HomeFragment : Fragment() {
 
     private fun handleWeatherResponse(state: ResponseStatus<*>) {
         when (state) {
-            is ResponseStatus.Loading -> {
-                // Show progress bar and hide UI elements
-                progressBarHourly.visibility = View.VISIBLE
-                progressBarDaily.visibility = View.VISIBLE
-                uiElements.values.forEach { it.visibility = View.GONE }
-            }
+            is ResponseStatus.Loading -> {}
             is ResponseStatus.Success<*> -> {
-                // Hide progress bar and show UI elements
-                progressBarHourly.visibility = View.GONE
-                progressBarDaily.visibility = View.GONE
                 when (val requestedData = state.requestedData) {
-                    is WeatherResponse -> {
-                        updateWeatherUI(requestedData)
-                        uiElements.values.forEach { it.visibility = View.VISIBLE }
-                    }
+                    is WeatherResponse -> updateWeatherUI(requestedData)
                 }
             }
-            is ResponseStatus.Failure -> {
-                // Hide progress bar and show error message
-                progressBarHourly.visibility = View.GONE
-                progressBarDaily.visibility = View.GONE
-                showSnackbar("Error: ${state.errorMessage}")
-            }
+            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
         }
     }
 
     private fun handleForecastResponse(state: ResponseStatus<*>) {
         when (state) {
-            is ResponseStatus.Loading -> {
-                // Show progress bar and hide UI elements
-                progressBarHourly.visibility = View.VISIBLE
-                progressBarDaily.visibility = View.VISIBLE
-                uiElements.values.forEach { it.visibility = View.GONE }
-            }
+            is ResponseStatus.Loading -> {}
             is ResponseStatus.Success<*> -> {
-                // Hide progress bar and show UI elements
-                progressBarHourly.visibility = View.GONE
-                progressBarDaily.visibility = View.GONE
                 when (val requestedData = state.requestedData) {
                     is ForecastResponse -> {
                         requestedData.list?.let { dailyAdapter.submitWeatherList(it) }
                         requestedData.list?.let { hourlyAdapter.submitTodayWeather(it) }
-                        uiElements.values.forEach { it.visibility = View.VISIBLE }
                     }
                 }
             }
-            is ResponseStatus.Failure -> {
-                // Hide progress bar and show error message
-                progressBarHourly.visibility = View.GONE
-                progressBarDaily.visibility = View.GONE
-                showSnackbar("Error: ${state.errorMessage}")
-            }
+            is ResponseStatus.Failure -> showSnackbar("Error: ${state.errorMessage}")
         }
     }
 
