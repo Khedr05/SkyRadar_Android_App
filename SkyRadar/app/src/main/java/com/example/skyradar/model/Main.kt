@@ -1,6 +1,7 @@
 package com.example.skyradar.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Main(
     val temp: Double,
@@ -18,4 +19,4 @@ data class Main(
     val humidity: Long,
     @SerializedName("temp_kf")
     val tempKf: Double,
-)
+): Serializable

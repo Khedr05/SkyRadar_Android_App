@@ -2,6 +2,7 @@ package com.example.skyradar.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
+import java.io.Serializable
 
 data class ForecastResponse(
     @ColumnInfo(name = "forecast_cod")
@@ -11,7 +12,7 @@ data class ForecastResponse(
     val list: List<WeatherList>? = null,
     @Embedded(prefix = "city_")
     val city: City? = null
-)
+): Serializable
 
 
 

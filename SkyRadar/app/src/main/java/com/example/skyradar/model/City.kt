@@ -2,6 +2,7 @@ package com.example.skyradar.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
+import java.io.Serializable
 
 data class City(
     @ColumnInfo(name = "city_id")
@@ -16,4 +17,4 @@ data class City(
     val timezone: Long,
     val sunrise: Long,
     val sunset: Long
-)
+): Serializable

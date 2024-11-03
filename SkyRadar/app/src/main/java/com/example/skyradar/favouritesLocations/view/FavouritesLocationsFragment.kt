@@ -14,12 +14,13 @@ import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModel
 import com.example.skyradar.favouritesLocations.viewmodel.FavouritesLocationsViewModelFactory
+import com.example.skyradar.model.DatabasePojo
 import com.example.skyradar.model.RepositoryImpl
 import com.example.skyradar.network.RemoteDataSourceImpl
 import com.example.skyradar.network.RetrofitInstance
 import kotlinx.coroutines.launch
 
-class FavouritesLocationsFragment : Fragment(){
+class FavouritesLocationsFragment : Fragment() {
 
     private lateinit var viewModel: FavouritesLocationsViewModel
     private lateinit var adapter: FavouritesLocationsAdapter
@@ -43,14 +44,29 @@ class FavouritesLocationsFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Find RecyclerView by ID
         recyclerViewFavoriteLocations = view.findViewById(R.id.recyclerViewFavoriteLocations)
 
-        adapter = FavouritesLocationsAdapter(emptyList())
+        adapter = FavouritesLocationsAdapter(emptyList()) { location ->
+            // Navigate to details fragment
+            val detailsFragment = FavouritesLocationsDetailsFragment()
+            val args = Bundle().apply {
+                putSerializable("selected_location", location) // Pass the location data
+            }
+            detailsFragment.arguments = args
+
+            // Use FragmentTransaction to navigate
+            parentFragmentManager.beginTransaction()
+                .replace(
+                    R.id.fragmentContainer,
+                    detailsFragment
+                ) // Make sure to replace with your container ID
+                .addToBackStack(null)
+                .commit()
+        }
+
         recyclerViewFavoriteLocations.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewFavoriteLocations.adapter = adapter
 
-        // Observe favorite locations from ViewModel
         lifecycleScope.launch {
             viewModel.favoriteLocations.collect { locations ->
                 adapter.updateLocations(locations)

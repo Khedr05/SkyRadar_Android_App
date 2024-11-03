@@ -9,7 +9,8 @@ import com.example.skyradar.R
 import com.example.skyradar.model.DatabasePojo
 
 class FavouritesLocationsAdapter(
-    private var locations: List<DatabasePojo>
+    private var locations: List<DatabasePojo>,
+    private val onItemClick: (DatabasePojo) -> Unit // Callback for item clicks
 ) : RecyclerView.Adapter<FavouritesLocationsAdapter.LocationViewHolder>() {
 
     class LocationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,12 +27,16 @@ class FavouritesLocationsAdapter(
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
         val location = locations[position]
         holder.cityName.text = location.Weather.name
-        holder.currentTemp.text = "${location.Weather?.main?.temp ?: "N/A"}°" // Using safe calls and a default value
+        holder.currentTemp.text = "${location.Weather.main?.temp ?: "N/A"}°" // Using safe call and default value
+
+        // Set click listener for the item
+        holder.itemView.setOnClickListener {
+            onItemClick(location) // Trigger the callback with the clicked location
+        }
     }
 
     override fun getItemCount(): Int = locations.size
 
-    // Method to update the list of locations
     fun updateLocations(newLocations: List<DatabasePojo>) {
         locations = newLocations
         notifyDataSetChanged()
