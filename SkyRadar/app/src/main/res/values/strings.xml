@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Weather</string>
+    <string name="app_name">SkyRadar</string>
     <string name="alerts">Alerts</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="search_for_a_place">Search for a place</string>
