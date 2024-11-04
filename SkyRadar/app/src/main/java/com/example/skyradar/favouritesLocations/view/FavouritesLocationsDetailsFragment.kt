@@ -69,8 +69,14 @@ class FavouritesLocationsDetailsFragment : Fragment() {
             // Fetch new data from the network
             val latitude = selectedLocation?.Weather?.coord?.lat.toString()
             val longitude = selectedLocation?.Weather?.coord?.lon.toString()
-            homeViewModel.fetchWeatherData(latitude, longitude, "metric", "en")
-            homeViewModel.fetchForecastData(latitude, longitude, "metric", "en")
+            var lang : String? = homeViewModel.getLanguage()
+            var unit : String? = homeViewModel.getUnit()
+
+            homeViewModel.fetchWeatherData(latitude,longitude, unit.toString(), lang.toString())
+            homeViewModel.fetchForecastData(latitude,longitude, unit.toString(), lang.toString())
+
+            //homeViewModel.fetchWeatherData(latitude, longitude, "metric", "en")
+            //homeViewModel.fetchForecastData(latitude, longitude, "metric", "en")
             observeViewModel();
             selectedLocation?.let { favViewModel.updateFavoriteLocation(it) }
             showDetails(selectedLocation)

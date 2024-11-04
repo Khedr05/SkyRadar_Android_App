@@ -66,8 +66,14 @@ class MapWeatherDetailsFragment : Fragment(){
 
         // Fetch weather and forecast data with retrieved latitude and longitude
         if (latitude != null && longitude != null) {
-            viewModel.fetchWeatherData(latitude.toString(), longitude.toString(), "metric", "en")
-            viewModel.fetchForecastData(latitude.toString(), longitude.toString(), "metric", "en")
+            var lang : String? = viewModel.getLanguage()
+            var unit : String? = viewModel.getUnit()
+
+            viewModel.fetchWeatherData(latitude.toString(),longitude.toString(), unit.toString(), lang.toString())
+            viewModel.fetchForecastData(latitude.toString(),longitude.toString(), unit.toString(), lang.toString())
+
+            //viewModel.fetchWeatherData(latitude.toString(), longitude.toString(), "metric", "en")
+            //viewModel.fetchForecastData(latitude.toString(), longitude.toString(), "metric", "en")
         } else {
             showSnackbar("Error: Invalid location data.")
         }

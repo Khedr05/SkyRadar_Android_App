@@ -19,11 +19,13 @@ import com.example.skyradar.network.RetrofitInstance
 import com.example.skyradar.settings.viewmodel.SettingsFactory
 import com.example.skyradar.settings.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var viewModel: SettingsViewModel
+    private var isInitialLoad = true // Flag to prevent immediate refresh on load
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,13 +60,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupLanguageSpinner(savedLanguage: String?) {
-        // Define the display names and corresponding language codes
         val languageOptions = listOf("Arabic", "English", "Mobile Language")
-        val languageCodeMap = mapOf("Arabic" to "ar", "English" to "en", "Mobile Language" to "Default Mobile Language")
+        val languageCodeMap = mapOf("Arabic" to "ar", "English" to "en", "Mobile Language" to "default")
         val languageAdapter = SettingsAdapter(requireContext(), languageOptions)
         binding.spinnerLanguage.adapter = languageAdapter
 
-// Set saved language as default selection if available
         savedLanguage?.let {
             val displayLanguage = languageCodeMap.entries.find { entry -> entry.value == it }?.key
             val position = languageOptions.indexOf(displayLanguage)
@@ -75,10 +75,16 @@ class SettingsFragment : Fragment() {
 
         binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                // Get the language code corresponding to the selected display name
-                val selectedLanguageCode = languageCodeMap[languageOptions[position]]
-                selectedLanguageCode?.let { viewModel.saveLanguage(it) }
+                if (!isInitialLoad) {
+                    val selectedLanguageCode = languageCodeMap[languageOptions[position]]
+                    selectedLanguageCode?.let {
+                        viewModel.saveLanguage(it)
+                        setLocale(it) // Apply language change here, including for "default" option
+                    }
+                }
+                isInitialLoad = false // Reset after the first load
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
@@ -88,7 +94,6 @@ class SettingsFragment : Fragment() {
         val unitAdapter = SettingsAdapter(requireContext(), unitOptions)
         binding.spinnerUnits.adapter = unitAdapter
 
-        // Set saved unit as default selection if available
         savedUnit?.let {
             val position = unitOptions.indexOf(it)
             if (position >= 0) {
@@ -102,6 +107,27 @@ class SettingsFragment : Fragment() {
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+    }
+
+    private fun setLocale(languageCode: String) {
+        val config = resources.configuration
+        val locale = if (languageCode == "default") {
+            // Retrieve and set the current device locale
+            Locale.getDefault()
+        } else {
+            // Set to the selected language
+            Locale(languageCode)
+        }
+        Locale.setDefault(locale)
+        config.setLocale(locale)
+
+        // Update resources with the new configuration
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Restart the entire application
+        val intent = requireActivity().intent
+        requireActivity().finish()
+        requireActivity().startActivity(intent)
     }
 
     override fun onDestroyView() {

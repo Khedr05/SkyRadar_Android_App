@@ -29,14 +29,20 @@ import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import android.app.AlertDialog
+import android.content.Context
 import android.util.Log
 import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
 import java.util.Locale
 import android.icu.text.SimpleDateFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.widget.ProgressBar
+import androidx.fragment.app.FragmentTransaction
 import com.example.skyradar.Helpers.formatTimestamp
 import com.example.skyradar.Helpers.getCurrentDate
+import com.example.skyradar.NetworkIssueFragment
 import java.util.Date
 
 class HomeFragment : Fragment() {
@@ -69,8 +75,16 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        observeViewModel()
-        checkLocationEnabled()
+        if (!isNetworkAvailable()) {
+            // Replace HomeFragment with NetworkIssueFragment
+            val transaction: FragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragmentContainer, NetworkIssueFragment()) // Replace with your fragment container ID
+            transaction.addToBackStack(null) // Optional: add to back stack to allow back navigation
+            transaction.commit()
+        } else {
+            observeViewModel()
+            checkLocationEnabled()
+        }
     }
 
     private fun initializeSettings() {
@@ -201,7 +215,6 @@ class HomeFragment : Fragment() {
 
         var lang : String? = viewModel.getLanguage()
         var unit : String? = viewModel.getUnit()
-        Log.i("hia de", "Language: $lang")
 
         viewModel.fetchWeatherData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
         viewModel.fetchForecastData(location.latitude.toString(), location.longitude.toString(), unit.toString(), lang.toString())
@@ -278,6 +291,18 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val networkCapabilities = connectivityManager.activeNetwork?.let {
+                connectivityManager.getNetworkCapabilities(it)
+            }
+            return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        }
+    }
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1

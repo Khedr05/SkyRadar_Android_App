@@ -10,7 +10,7 @@
         android:id="@+id/showTimePickerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/add_alarm"
+        android:src="@drawable/ic_add_to_favs"
         android:contentDescription="show_time_picker"
         android:background="?attr/selectableItemBackground"
         android:backgroundTint="@color/white"

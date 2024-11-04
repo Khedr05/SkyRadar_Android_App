@@ -3,6 +3,7 @@ package com.example.skyradar.map.view
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -27,10 +28,9 @@ import org.osmdroid.events.MapEventsReceiver
 import java.io.File
 import java.util.Locale
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
-
+import com.example.skyradar.NetworkIssueFragment
 
 class MapFragment : Fragment() {
 
@@ -62,6 +62,16 @@ class MapFragment : Fragment() {
         autoCompleteTextView = view.findViewById(R.id.autoCompleteTextView)
         buttonLayout = view.findViewById(R.id.buttonLayout)
         weatherDetailsButton = view.findViewById(R.id.weatherDetailsButton)
+
+        // Check for network connectivity
+        if (!isNetworkAvailable()) {
+            // Replace MapFragment with NetworkIssueFragment
+            val transaction: FragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragmentContainer, NetworkIssueFragment()) // Replace with your fragment container ID
+            transaction.addToBackStack(null) // Optional: add to back stack to allow back navigation
+            transaction.commit()
+            return view // Return early to avoid further setup
+        }
 
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
@@ -96,6 +106,12 @@ class MapFragment : Fragment() {
             }
         }
         return view
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        return activeNetwork != null && activeNetwork.isConnected
     }
 
     private fun showButtons() {
