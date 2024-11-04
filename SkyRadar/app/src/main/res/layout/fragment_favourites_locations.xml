@@ -3,11 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
     tools:context=".favouritesLocations.view.FavouritesLocationsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFavoriteLocations"
         android:layout_width="match_parent"
+        android:layout_marginTop="100dp"
         android:layout_height="match_parent"/>
 
 </FrameLayout>

@@ -1,12 +1,19 @@
 package com.example.skyradar.favouritesLocations.view
 
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skyradar.R
@@ -25,6 +32,9 @@ class FavouritesLocationsFragment : Fragment() {
     private lateinit var viewModel: FavouritesLocationsViewModel
     private lateinit var adapter: FavouritesLocationsAdapter
     private lateinit var recyclerViewFavoriteLocations: RecyclerView
+    private val backgroundColor = ColorDrawable(Color.RED)
+    private lateinit var deleteIcon: Drawable
+    private val iconMargin = 32 // margin between the icon and the edge of the item view
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,5 +82,64 @@ class FavouritesLocationsFragment : Fragment() {
                 adapter.updateLocations(locations)
             }
         }
+
+        // Initialize the delete icon
+        deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.delete)!!
+
+        // Setup ItemTouchHelper for swipe-to-delete
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val location = adapter.getLocationAtPosition(position)
+
+                // Delete the location from ViewModel
+                viewModel.removeFavoriteLocation(location)
+                Toast.makeText(requireContext(), "Location deleted", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val iconTop = itemView.top + (itemView.height - deleteIcon.intrinsicHeight) / 2
+                    val iconBottom = iconTop + deleteIcon.intrinsicHeight
+
+                    if (dX > 0) { // Swiping to the right
+                        val iconLeft = itemView.left + iconMargin
+                        val iconRight = iconLeft + deleteIcon.intrinsicWidth
+                        deleteIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        backgroundColor.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
+                    } else if (dX < 0) { // Swiping to the left
+                        val iconLeft = itemView.right - iconMargin - deleteIcon.intrinsicWidth
+                        val iconRight = itemView.right - iconMargin
+                        deleteIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        backgroundColor.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                    } else {
+                        backgroundColor.setBounds(0, 0, 0, 0)
+                    }
+
+                    backgroundColor.draw(c)
+                    deleteIcon.draw(c)
+                }
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(recyclerViewFavoriteLocations)
     }
 }
