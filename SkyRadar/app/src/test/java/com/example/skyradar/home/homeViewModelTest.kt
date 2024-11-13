@@ -56,7 +56,7 @@ class HomeViewModelTest {
         fakeRepository.weatherResponse = mockWeather
 
         // When
-        homeViewModel.fetchWeatherData("40.7128", "-74.0060", "metric", "en")
+        homeViewModel.fetchWeatherData("12.34", "56.78", "metric", "en")
 
         val dispatcher= StandardTestDispatcher()
         dispatcher.scheduler. advanceUntilIdle( )
@@ -73,7 +73,7 @@ class HomeViewModelTest {
         fakeRepository.forecastResponse = mockForecast
 
         // When
-        homeViewModel.fetchForecastData("40.7128", "-74.0060", "metric", "en")
+        homeViewModel.fetchForecastData("12.34", "56.78", "metric", "en")
         advanceUntilIdle()
 
         // Then
@@ -87,7 +87,7 @@ class HomeViewModelTest {
         fakeRepository.weatherResponse = null  // Simulate an error
 
         // When
-        homeViewModel.fetchWeatherData("40.7128", "-74.0060", "metric", "en")
+        homeViewModel.fetchWeatherData("12.34", "56.78", "metric", "en")
         advanceUntilIdle()
 
         // Then
@@ -101,7 +101,7 @@ class HomeViewModelTest {
         fakeRepository.forecastResponse = null  // Simulate an error
 
         // When
-        homeViewModel.fetchForecastData("40.7128", "-74.0060", "metric", "en")
+        homeViewModel.fetchForecastData("12.34", "56.78", "metric", "en")
         advanceUntilIdle()
 
         // Then
