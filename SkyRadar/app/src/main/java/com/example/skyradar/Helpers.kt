@@ -32,4 +32,27 @@ object Helpers {
         return dateFormat.format(Date())
     }
 
+    fun getMeasurementString(
+        isWind: Boolean,
+        lang: String = "en",
+        unit: String = "metric"
+    ): String {
+        return if (isWind) {
+            // Wind measurement
+            when (unit) {
+                "imperial" -> if (lang == "ar") "ميل/س" else "mph"  // Miles per hour for Imperial
+                "metric" -> if (lang == "ar") "م/ث" else "m/s"      // Meters per second for Metric
+                else -> if (lang == "ar") "م/ث" else "m/s"          // Default to m/s for Standard
+            }
+        } else {
+            // Temperature measurement
+            when (unit) {
+                "imperial" -> if (lang == "ar") "ف" else "F"       // Fahrenheit
+                "metric" -> if (lang == "ar") "س" else "C"         // Celsius
+                else -> if (lang == "ar") "ك" else "K"             // Kelvin (Standard)
+            }
+        }
+    }
+
+
 }

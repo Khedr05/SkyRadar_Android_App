@@ -42,6 +42,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.FragmentTransaction
 import com.example.skyradar.Helpers.formatTimestamp
 import com.example.skyradar.Helpers.getCurrentDate
+import com.example.skyradar.Helpers.getMeasurementString
 import com.example.skyradar.NetworkIssueFragment
 import java.util.Date
 
@@ -261,13 +262,13 @@ class HomeFragment : Fragment() {
 
         uiElements["date"]?.text = getCurrentDate()
         uiElements["cityName"]?.text = requestedData.name
-        uiElements["currentTempValue"]?.text = requestedData.main?.temp.toString()
+        uiElements["currentTempValue"]?.text = requestedData.main?.temp.toString() + getMeasurementString(false, lang = viewModel.getLanguage().toString(), unit = viewModel.getUnit().toString())
         uiElements["weatherValue"]?.text = requestedData.weather?.get(0)?.description?.capitalize()
         uiElements["humidityValue"]?.text = requestedData.main?.humidity.toString()
         uiElements["pressureValue"]?.text = requestedData.main?.pressure.toString()
         uiElements["tempMaxValue"]?.text = requestedData.main?.tempMax.toString()
         uiElements["tempMinValue"]?.text = requestedData.main?.tempMin.toString()
-        uiElements["windSpeedValue"]?.text = requestedData.wind?.speed.toString()
+        uiElements["windSpeedValue"]?.text = requestedData.wind?.speed.toString() + getMeasurementString(true, lang = viewModel.getLanguage().toString(), unit = viewModel.getUnit().toString())
         uiElements["cloudsValue"]?.text = requestedData.clouds?.all.toString()
         uiElements["sunriseValue"]?.text = formatTimestamp(requestedData.sys?.sunrise)
         uiElements["sunsetValue"]?.text = formatTimestamp(requestedData.sys?.sunset)

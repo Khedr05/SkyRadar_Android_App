@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.skyradar.Helpers.formatTimestamp
 import com.example.skyradar.Helpers.getCurrentDate
+import com.example.skyradar.Helpers.getMeasurementString
 import com.example.skyradar.R
 import com.example.skyradar.database.AlarmLocalDataSourceImpl
 import com.example.skyradar.database.LocationLocalDataSourceImpl
@@ -180,7 +181,7 @@ class MapWeatherDetailsFragment : Fragment(){
     private fun updateWeatherUI(requestedData: WeatherResponse) {
         uiElements["date"]?.text = getCurrentDate()
         uiElements["cityName"]?.text = requestedData.name
-        uiElements["currentTempValue"]?.text = requestedData.main?.temp.toString()
+    uiElements["currentTempValue"]?.text = requestedData.main?.temp.toString()
         uiElements["weatherValue"]?.text = requestedData.weather?.get(0)?.description?.capitalize()
         uiElements["humidityValue"]?.text = requestedData.main?.humidity.toString()
         uiElements["pressureValue"]?.text = requestedData.main?.pressure.toString()
