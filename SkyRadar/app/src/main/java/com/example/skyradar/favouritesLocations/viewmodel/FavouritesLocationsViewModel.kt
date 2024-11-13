@@ -42,5 +42,5 @@ class FavouritesLocationsViewModel(private val _repo: Repository) : ViewModel() 
             _repo.updateFavorite(location)
             fetchFavoriteLocations() // Refresh favorite locations
         }
-        }
+    }
 }

@@ -9,14 +9,16 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.skyradar.MyApplication
 import com.example.skyradar.database.AlarmLocalDataSource
+import com.example.skyradar.network.RemoteDataSource
 
 class RepositoryImpl(
-    private val remoteDataSource: RemoteDataSourceImpl,
+    private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocationLocalDataSource,
-    private val alarmLocalDataSource: AlarmLocalDataSource
+    private val alarmLocalDataSource: AlarmLocalDataSource,
+    private val sharedPreferences: SharedPreferences
 ) : Repository {
 
-    private val sharedPreferences: SharedPreferences = MyApplication.context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
+//    private val sharedPreferences: SharedPreferences = MyApplication.context.getSharedPreferences("settings_prefs", Context.MODE_PRIVATE)
 
     // Fetch weather data by latitude and longitude
     override fun getForecastData(

@@ -1,5 +1,6 @@
 package com.example.skyradar.settings.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +43,8 @@ class SettingsFragment : Fragment() {
             RepositoryImpl(
                 RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
                 LocationLocalDataSourceImpl.getInstance(requireContext()),
-                AlarmLocalDataSourceImpl.getInstance(requireContext())
-            )
+                AlarmLocalDataSourceImpl.getInstance(requireContext()),
+                requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE))
         )
 
         viewModel = ViewModelProvider(this, factory).get(SettingsViewModel::class.java)

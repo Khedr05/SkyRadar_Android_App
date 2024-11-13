@@ -196,14 +196,16 @@ class FavouritesLocationsDetailsFragment : Fragment() {
             RepositoryImpl(
                 RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
                 LocationLocalDataSourceImpl.getInstance(requireContext()),
-                AlarmLocalDataSourceImpl.getInstance(requireContext()))
+                AlarmLocalDataSourceImpl.getInstance(requireContext()),
+                requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE))
         )
         favViewModel = ViewModelProvider(this, factory).get(FavouritesLocationsViewModel::class.java)
 
         val homeFactory = HomeFactory(RepositoryImpl(
             RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
             LocationLocalDataSourceImpl.getInstance(requireContext()),
-            AlarmLocalDataSourceImpl.getInstance(requireContext()))
+            AlarmLocalDataSourceImpl.getInstance(requireContext()),
+            requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE))
         )
         homeViewModel = ViewModelProvider(this, homeFactory).get(HomeViewModel::class.java)
     }

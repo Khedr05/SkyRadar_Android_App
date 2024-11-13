@@ -132,7 +132,8 @@ class HomeFragment : Fragment() {
         val factory = HomeFactory(
             RepositoryImpl(RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
                 LocationLocalDataSourceImpl.getInstance(requireContext()),
-                AlarmLocalDataSourceImpl.getInstance(requireContext()))
+                AlarmLocalDataSourceImpl.getInstance(requireContext()),
+                requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE))
         )
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
     }

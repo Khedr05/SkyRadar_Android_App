@@ -1,5 +1,6 @@
 package com.example.skyradar.favouritesLocations.view
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -44,8 +45,8 @@ class FavouritesLocationsFragment : Fragment() {
             RepositoryImpl(
                 RemoteDataSourceImpl.getInstance(RetrofitInstance.retrofit),
                 LocationLocalDataSourceImpl.getInstance(requireContext()),
-                AlarmLocalDataSourceImpl.getInstance(requireContext())
-            )
+                AlarmLocalDataSourceImpl.getInstance(requireContext()),
+                requireContext().getSharedPreferences("settings_prefs", Context.MODE_PRIVATE))
         )
         viewModel = ViewModelProvider(this, factory).get(FavouritesLocationsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_favourites_locations, container, false)
