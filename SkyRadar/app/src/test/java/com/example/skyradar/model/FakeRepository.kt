@@ -8,61 +8,57 @@ class FakeRepository : Repository {
     var weatherResponse: WeatherResponse? = null
     var forecastResponse: ForecastResponse? = null
 
+    private val favoriteLocations = mutableListOf<DatabasePojo>()
+    private val favoriteLocationsFlow = flow { emit(favoriteLocations) }
+
     override fun getForecastData(latitude: String, longitude: String, units: String, lang: String): Flow<ForecastResponse> {
         return flow {
-            if (forecastResponse == null) {
-                throw Exception("Simulated error")
-            } else {
-                emit(forecastResponse!!)
-            }
+            forecastResponse?.let { emit(it) } ?: emit(forecastResponse!!) // Emit thfault empty Weather=====
         }
     }
 
     override fun getForecastDataByCityName(cityName: String, units: String, lang: String): Flow<ForecastResponse> {
         return flow {
-            if (forecastResponse == null) {
-                throw Exception("Simulated error")
-            } else {
-                emit(forecastResponse!!)
-            }
+            forecastResponse?.let { emit(it) } ?: emit(forecastResponse!!) // Emit thfault empty Weather=====
         }
     }
 
     override fun getWeatherData(latitude: String, longitude: String, units: String, lang: String): Flow<WeatherResponse> {
         return flow {
-            if (weatherResponse == null) {
-                throw Exception("Simulated error")
-            } else {
-                emit(weatherResponse!!)
-            }
+            weatherResponse?.let { emit(it) } ?: emit(weatherResponse!!) // Emit thfault empty Weather=====
         }
     }
 
     override fun getWeatherDataByCityName(cityName: String, units: String, lang: String): Flow<WeatherResponse> {
         return flow {
-            if (weatherResponse == null) {
-                throw Exception("Simulated error")
-            } else {
-                emit(weatherResponse!!)
-            }
+            weatherResponse?.let { emit(it) } ?: emit(weatherResponse!!) // Emit thfault empty Weather=====
         }
     }
 
 
+    // Implement the method to add a location to favorites
     override suspend fun addFavorite(location: DatabasePojo) {
-        TODO("Not yet implemented")
+        favoriteLocations.add(location)
     }
 
+    // Implement the method to remove a location from favorites
     override suspend fun removeFavorite(location: DatabasePojo) {
-        TODO("Not yet implemented")
+        favoriteLocations.remove(location)
     }
 
+    // Implement the method to update a favorite location
     override suspend fun updateFavorite(location: DatabasePojo) {
-        TODO("Not yet implemented")
+        val index = favoriteLocations.indexOfFirst { it.id == location.id }
+        if (index != -1) {
+            favoriteLocations[index] = location
+        } else {
+            favoriteLocations.add(location)
+        }
     }
 
+    // Implement the method to retrieve favorite locations
     override fun getFavoriteLocations(): Flow<List<DatabasePojo>> {
-        TODO("Not yet implemented")
+        return flow { emit(favoriteLocations) }
     }
 
     override suspend fun insertAlarm(alarm: Alarm) {
